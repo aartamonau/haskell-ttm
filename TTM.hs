@@ -32,6 +32,10 @@ instance Right (Tape l c r) r
 data One  = One
 data Zero = Zero
 
+data MLeft  = MLeft
+data MRight = MRight
+data MNoop  = MNoop
+
 class MoveLeft' t n t' | t n -> t'
 instance MoveLeft' (Tape l c r) True (Tape (Cons c l) Zero Nil)
 instance (Tail r t, Head r h) =>
@@ -53,6 +57,14 @@ class MoveRight t t' | t -> t' where
   moveRight = undefined
 
 instance (IsNull r n, Left t r, MoveRight' t n t') => MoveRight t t'
+
+class Move m t t' | m t -> t' where
+  move :: m -> t -> t'
+  move = undefined
+
+instance MoveLeft  t t' => Move MLeft  t t'
+instance MoveRight t t' => Move MRight t t'
+instance Move MNoop t t
 
 class Write a t t' | a t -> t' where
   write :: a -> t -> t'
