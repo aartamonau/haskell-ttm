@@ -53,3 +53,10 @@ class MoveRight t t' | t -> t' where
   moveRight = undefined
 
 instance (IsNull r n, Left t r, MoveRight' t n t') => MoveRight t t'
+
+class Write a t t' | a t -> t' where
+  write :: a -> t -> t'
+  write = undefined
+
+instance Write Zero (Tape l c r) (Tape l Zero r)
+instance Write One  (Tape l c r) (Tape l One r)
