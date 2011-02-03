@@ -46,14 +46,14 @@ data MRight = MRight
 data MNoop  = MNoop
 
 class MoveLeft' t n t' | t n -> t'
-instance MoveLeft' (Tape l c r) True (Tape (Cons c l) Zero Nil)
-instance (Tail r t, Head r h) =>
-         MoveLeft' (Tape l c r) False (Tape (Cons c l) h t)
+instance MoveLeft' (Tape Nil c r) True (Tape Nil Zero (Cons c r))
+instance (Tail l t, Head l h) =>
+         MoveLeft' (Tape l c r) False (Tape t h (Cons c r))
 
 class MoveRight' t n t' | t n -> t'
-instance MoveRight' (Tape Nil c r) True (Tape Nil Zero (Cons c r))
-instance (Tail l t, Head l h) =>
-         MoveRight' (Tape l c r) False (Tape t h (Cons c r))
+instance MoveRight' (Tape l c r) True (Tape (Cons c l) Zero Nil)
+instance (Tail r t, Head r h) =>
+         MoveRight' (Tape l c r) False (Tape (Cons c l) h t)
 
 class MoveLeft t t' | t -> t' where
   moveLeft :: t -> t'
