@@ -32,6 +32,18 @@ instance Right (Tape l c r) r
 data One  = One
 data Zero = Zero
 
+class IsSymbol s
+instance IsSymbol One
+instance IsSymbol Zero
+
+class IsSymbolList xs
+instance IsSymbolList Nil
+instance (IsSymbolList xs, IsSymbol x) => IsSymbolList (Cons x xs)
+
+class IsTape t
+instance (IsSymbolList l, IsSymbolList r) => IsTape (Tape l One  r)
+instance (IsSymbolList l, IsSymbolList r) => IsTape (Tape l Zero r)
+
 class Equals x y r | x y -> r where
   equals :: x -> y -> r
   equals = undefined
@@ -280,6 +292,7 @@ class Exec tbl t t' s' | tbl t -> t' s' where
   exec :: tbl -> t -> (t', s')
   exec = undefined
 
-instance (ExecStep tbl t Sz t' s',
+instance (IsTape t,
+          ExecStep tbl t Sz t' s',
           Exec' tbl t' s' t Sz rt rs) =>
          Exec tbl t rt rs
