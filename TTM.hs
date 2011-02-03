@@ -253,3 +253,33 @@ class FindRule tbl t s r | tbl t s -> r where
 instance FindRule Nil t s False
 instance (IsMatchingRule r s t rm, FindRule' (Cons r rs) t s rm res) =>
          FindRule (Cons r rs) t s res
+
+class ExecRule r t s t' s' | r t s -> t' s' where
+  execRule :: r -> t -> s -> (t', s')
+  execRule = undefined
+
+instance ExecRule False t s False False
+instance Move m (Tape l a' r) t' =>
+         ExecRule (Rule s a s' a' m) (Tape l a r) s t' s'
+
+class ExecStep tbl t s t' s' | tbl t s -> t' s' where
+  execStep :: tbl -> t -> s -> (t', s')
+  execStep = undefined
+
+instance (FindRule tbl t s r, ExecRule r t s t' s') =>
+         ExecStep tbl t s t' s'
+
+class Exec' tbl tn sn t s t' s' | tbl tn sn t s -> t' s' where
+
+instance Exec' tbl False False t s t s
+instance (ExecStep tbl (Tape tnl tnc tnr) sn tn' sn',
+          Exec' table tn' sn' (Tape tnl tnc tnr) sn t' s') =>
+         Exec' tbl (Tape tnl tnc tnr) sn t s t' s'
+
+class Exec tbl t t' s' | tbl t -> t' s' where
+  exec :: tbl -> t -> (t', s')
+  exec = undefined
+
+instance (ExecStep tbl t Sz t' s',
+          Exec' tbl t' s' t Sz rt rs) =>
+         Exec tbl t rt rs
