@@ -72,3 +72,148 @@ class Write a t t' | a t -> t' where
 
 instance Write Zero (Tape l c r) (Tape l Zero r)
 instance Write One  (Tape l c r) (Tape l One r)
+
+data Sz = Sz
+data S0 a = S0 a
+data S1 a = S1 a
+data S2 a = S2 a
+data S3 a = S3 a
+data S4 a = S4 a
+data S5 a = S5 a
+data S6 a = S6 a
+data S7 a = S7 a
+data S8 a = S8 a
+data S9 a = S9 a
+
+class State' s
+instance State' Sz
+instance State' xs => State' (S0 xs)
+instance State' xs => State' (S1 xs)
+instance State' xs => State' (S2 xs)
+instance State' xs => State' (S3 xs)
+instance State' xs => State' (S4 xs)
+instance State' xs => State' (S5 xs)
+instance State' xs => State' (S6 xs)
+instance State' xs => State' (S7 xs)
+instance State' xs => State' (S8 xs)
+instance State' xs => State' (S9 xs)
+
+class State' s => State s
+instance State Sz
+instance State' xs => State (S1 xs)
+instance State' xs => State (S2 xs)
+instance State' xs => State (S3 xs)
+instance State' xs => State (S4 xs)
+instance State' xs => State (S5 xs)
+instance State' xs => State (S6 xs)
+instance State' xs => State (S7 xs)
+instance State' xs => State (S8 xs)
+instance State' xs => State (S9 xs)
+
+class Equals x y r | x y -> r where
+  equals :: x -> y -> r
+  equals = undefined
+
+instance Equals Sz Sz True
+instance State (x xs) => Equals Sz (x xs) False
+instance State (x xs) => Equals (x xs) Sz False
+instance Equals xs ys r => Equals (S0 xs) (S0 ys) r
+instance Equals xs ys r => Equals (S1 xs) (S1 ys) r
+instance Equals xs ys r => Equals (S2 xs) (S2 ys) r
+instance Equals xs ys r => Equals (S3 xs) (S3 ys) r
+instance Equals xs ys r => Equals (S4 xs) (S4 ys) r
+instance Equals xs ys r => Equals (S5 xs) (S5 ys) r
+instance Equals xs ys r => Equals (S6 xs) (S6 ys) r
+instance Equals xs ys r => Equals (S7 xs) (S7 ys) r
+instance Equals xs ys r => Equals (S8 xs) (S8 ys) r
+instance Equals xs ys r => Equals (S9 xs) (S9 ys) r
+instance Equals (S0 xs) (S1 ys) False
+instance Equals (S0 xs) (S2 ys) False
+instance Equals (S0 xs) (S3 ys) False
+instance Equals (S0 xs) (S4 ys) False
+instance Equals (S0 xs) (S5 ys) False
+instance Equals (S0 xs) (S6 ys) False
+instance Equals (S0 xs) (S7 ys) False
+instance Equals (S0 xs) (S8 ys) False
+instance Equals (S0 xs) (S9 ys) False
+instance Equals (S1 xs) (S0 ys) False
+instance Equals (S1 xs) (S2 ys) False
+instance Equals (S1 xs) (S3 ys) False
+instance Equals (S1 xs) (S4 ys) False
+instance Equals (S1 xs) (S5 ys) False
+instance Equals (S1 xs) (S6 ys) False
+instance Equals (S1 xs) (S7 ys) False
+instance Equals (S1 xs) (S8 ys) False
+instance Equals (S1 xs) (S9 ys) False
+instance Equals (S2 xs) (S0 ys) False
+instance Equals (S2 xs) (S1 ys) False
+instance Equals (S2 xs) (S3 ys) False
+instance Equals (S2 xs) (S4 ys) False
+instance Equals (S2 xs) (S5 ys) False
+instance Equals (S2 xs) (S6 ys) False
+instance Equals (S2 xs) (S7 ys) False
+instance Equals (S2 xs) (S8 ys) False
+instance Equals (S2 xs) (S9 ys) False
+instance Equals (S3 xs) (S0 ys) False
+instance Equals (S3 xs) (S1 ys) False
+instance Equals (S3 xs) (S2 ys) False
+instance Equals (S3 xs) (S4 ys) False
+instance Equals (S3 xs) (S5 ys) False
+instance Equals (S3 xs) (S6 ys) False
+instance Equals (S3 xs) (S7 ys) False
+instance Equals (S3 xs) (S8 ys) False
+instance Equals (S3 xs) (S9 ys) False
+instance Equals (S4 xs) (S0 ys) False
+instance Equals (S4 xs) (S1 ys) False
+instance Equals (S4 xs) (S2 ys) False
+instance Equals (S4 xs) (S3 ys) False
+instance Equals (S4 xs) (S5 ys) False
+instance Equals (S4 xs) (S6 ys) False
+instance Equals (S4 xs) (S7 ys) False
+instance Equals (S4 xs) (S8 ys) False
+instance Equals (S4 xs) (S9 ys) False
+instance Equals (S5 xs) (S0 ys) False
+instance Equals (S5 xs) (S1 ys) False
+instance Equals (S5 xs) (S2 ys) False
+instance Equals (S5 xs) (S3 ys) False
+instance Equals (S5 xs) (S4 ys) False
+instance Equals (S5 xs) (S6 ys) False
+instance Equals (S5 xs) (S7 ys) False
+instance Equals (S5 xs) (S8 ys) False
+instance Equals (S5 xs) (S9 ys) False
+instance Equals (S6 xs) (S0 ys) False
+instance Equals (S6 xs) (S1 ys) False
+instance Equals (S6 xs) (S2 ys) False
+instance Equals (S6 xs) (S3 ys) False
+instance Equals (S6 xs) (S4 ys) False
+instance Equals (S6 xs) (S5 ys) False
+instance Equals (S6 xs) (S7 ys) False
+instance Equals (S6 xs) (S8 ys) False
+instance Equals (S6 xs) (S9 ys) False
+instance Equals (S7 xs) (S0 ys) False
+instance Equals (S7 xs) (S1 ys) False
+instance Equals (S7 xs) (S2 ys) False
+instance Equals (S7 xs) (S3 ys) False
+instance Equals (S7 xs) (S4 ys) False
+instance Equals (S7 xs) (S5 ys) False
+instance Equals (S7 xs) (S6 ys) False
+instance Equals (S7 xs) (S8 ys) False
+instance Equals (S7 xs) (S9 ys) False
+instance Equals (S8 xs) (S0 ys) False
+instance Equals (S8 xs) (S1 ys) False
+instance Equals (S8 xs) (S2 ys) False
+instance Equals (S8 xs) (S3 ys) False
+instance Equals (S8 xs) (S4 ys) False
+instance Equals (S8 xs) (S5 ys) False
+instance Equals (S8 xs) (S6 ys) False
+instance Equals (S8 xs) (S7 ys) False
+instance Equals (S8 xs) (S9 ys) False
+instance Equals (S9 xs) (S0 ys) False
+instance Equals (S9 xs) (S1 ys) False
+instance Equals (S9 xs) (S2 ys) False
+instance Equals (S9 xs) (S3 ys) False
+instance Equals (S9 xs) (S4 ys) False
+instance Equals (S9 xs) (S5 ys) False
+instance Equals (S9 xs) (S6 ys) False
+instance Equals (S9 xs) (S7 ys) False
+instance Equals (S9 xs) (S8 ys) False
