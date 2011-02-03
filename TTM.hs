@@ -241,3 +241,15 @@ class IsMatchingRule r s t b | r s t -> b where
 
 instance (Equals rs s r1, Equals ra tc r2, And r1 r2 r) =>
           IsMatchingRule (Rule rs ra rs' ra' rm) s (Tape tl tc tr) r
+
+class FindRule' tbl t s eq r | tbl t s eq -> r
+instance FindRule' (Cons r rs) t s True r
+instance FindRule rs t s res => FindRule' (Cons r rs) t s False res
+
+class FindRule tbl t s r | tbl t s -> r where
+  findRule :: tbl -> t -> s -> r
+  findRule = undefined
+
+instance FindRule Nil t s False
+instance (IsMatchingRule r s t rm, FindRule' (Cons r rs) t s rm res) =>
+         FindRule (Cons r rs) t s res
