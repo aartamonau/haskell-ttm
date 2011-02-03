@@ -32,6 +32,15 @@ instance Right (Tape l c r) r
 data One  = One
 data Zero = Zero
 
+class Equals x y r | x y -> r where
+  equals :: x -> y -> r
+  equals = undefined
+
+instance Equals One  One  True
+instance Equals One  Zero False
+instance Equals Zero One  False
+instance Equals Zero Zero True
+
 data MLeft  = MLeft
 data MRight = MRight
 data MNoop  = MNoop
@@ -109,10 +118,6 @@ instance State' xs => State (S6 xs)
 instance State' xs => State (S7 xs)
 instance State' xs => State (S8 xs)
 instance State' xs => State (S9 xs)
-
-class Equals x y r | x y -> r where
-  equals :: x -> y -> r
-  equals = undefined
 
 instance Equals Sz Sz True
 instance State (x xs) => Equals Sz (x xs) False
@@ -217,3 +222,22 @@ instance Equals (S9 xs) (S5 ys) False
 instance Equals (S9 xs) (S6 ys) False
 instance Equals (S9 xs) (S7 ys) False
 instance Equals (S9 xs) (S8 ys) False
+
+
+data Rule s a a' s' m = Rule s a a' s' m
+
+class And x y r | x y -> r where
+  tAnd :: x -> y -> r
+  tAnd = undefined
+
+instance And True  True  True
+instance And True  False False
+instance And False True  False
+instance And False False False
+
+class IsMatchingRule r s t b | r s t -> b where
+  isMatchingRule :: r -> s -> t -> b
+  isMatchingRule = undefined
+
+instance (Equals rs s r1, Equals ra tc r2, And r1 r2 r) =>
+          IsMatchingRule (Rule rs ra rs' ra' rm) s (Tape tl tc tr) r
