@@ -4,6 +4,32 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 
+module TTM
+       (
+         Cons   ( (:+:) )
+       , Nil    ( Nil )
+       , Tape   ( Tape )
+       , Rule   ( Rule )
+       , Zero   ( Zero )
+       , One    ( One )
+       , MLeft  ( MLeft )
+       , MRight ( MRight )
+       , MNoop  ( MNoop )
+       , Sz     ( Sz )
+       , S0     ( S0 )
+       , S1     ( S1 )
+       , S2     ( S2 )
+       , S3     ( S3 )
+       , S4     ( S4 )
+       , S5     ( S5 )
+       , S6     ( S6 )
+       , S7     ( S7 )
+       , S8     ( S8 )
+       , S9     ( S9 )
+       , Exec   ( exec )
+       )
+       where
+
 infixr 5 :+:
 data Cons x xs = x :+: xs
 data Nil = Nil
