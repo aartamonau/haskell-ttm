@@ -102,13 +102,13 @@ class MoveLeft t t' | t -> t' where
   moveLeft :: t -> t'
   moveLeft = undefined
 
-instance (IsNull r n, Right t r, MoveLeft' t n t') => MoveLeft t t'
+instance (IsNull l n, Left t l, MoveLeft' t n t') => MoveLeft t t'
 
 class MoveRight t t' | t -> t' where
   moveRight :: t -> t'
   moveRight = undefined
 
-instance (IsNull r n, Left t r, MoveRight' t n t') => MoveRight t t'
+instance (IsNull r n, Right t r, MoveRight' t n t') => MoveRight t t'
 
 class Move m t t' | m t -> t' where
   move :: m -> t -> t'
