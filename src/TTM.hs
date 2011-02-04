@@ -325,7 +325,7 @@ class Exec' tbl tn sn t s t' s' | tbl tn sn t s -> t' s' where
 
 instance Exec' tbl False False t s t s
 instance (ExecStep tbl (Tape tnl tnc tnr) sn tn' sn',
-          Exec' table tn' sn' (Tape tnl tnc tnr) sn t' s') =>
+          Exec' tbl tn' sn' (Tape tnl tnc tnr) sn t' s') =>
          Exec' tbl (Tape tnl tnc tnr) sn t s t' s'
 
 class Exec tbl t t' s' | tbl t -> t' s' where
