@@ -1,0 +1,35 @@
+name:     ttm
+version:  0.0.1
+synopsis: Deterministic Turing machine working within Haskell type system.
+
+description:
+  Deterministic Turing machine working within Haskell type system.
+
+license:       LGPL
+license-file:  LICENSE
+author:        Aliaksiej Artamonaŭ
+maintainer:    Aliaksiej Artamonaŭ <aliaksiej.artamonau@gmail.com>
+build-type:    Simple
+cabal-version: >= 1.6
+homepage:      http://github.com/shaleny/haskell-ttm
+category:      Language
+
+extra-source-files:
+  LICENSE
+
+
+------------------------------------------------------------------------------
+library
+  hs-source-dirs: src
+
+  exposed-modules:
+    TTM
+
+  build-depends:
+    base >= 4
+
+  ghc-options: -Wall -fwarn-tabs -O2
+               -fno-warn-unused-do-bind -fno-warn-name-shadowing
+
+
+------------------------------------------------------------------------------
