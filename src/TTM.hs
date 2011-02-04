@@ -88,15 +88,26 @@ instance IsMovement MLeft
 instance IsMovement MRight
 instance IsMovement MNoop
 
+class Simplify t t' | t -> t' where
+  simplify :: t -> t'
+  simplify = undefined
+
+instance Simplify Nil Nil
+instance Simplify (Cons Zero Nil) Nil
+instance Simplify (Cons Zero (Cons x xs)) (Cons Zero (Cons x xs))
+instance Simplify (Cons One xs) (Cons One xs)
+
 class MoveLeft' t n t' | t n -> t'
-instance MoveLeft' (Tape Nil c r) True (Tape Nil Zero (Cons c r))
-instance (Tail l t, Head l h) =>
-         MoveLeft' (Tape l c r) False (Tape t h (Cons c r))
+instance Simplify (Cons c r) r' =>
+         MoveLeft' (Tape Nil c r) True (Tape Nil Zero r')
+instance (Tail l t, Head l h, Simplify (Cons c r) r') =>
+         MoveLeft' (Tape l c r) False (Tape t h r')
 
 class MoveRight' t n t' | t n -> t'
-instance MoveRight' (Tape l c r) True (Tape (Cons c l) Zero Nil)
-instance (Tail r t, Head r h) =>
-         MoveRight' (Tape l c r) False (Tape (Cons c l) h t)
+instance Simplify (Cons c l) l' =>
+         MoveRight' (Tape l c r) True (Tape l' Zero Nil)
+instance (Tail r t, Head r h, Simplify (Cons c l) l') =>
+         MoveRight' (Tape l c r) False (Tape l' h t)
 
 class MoveLeft t t' | t -> t' where
   moveLeft :: t -> t'
