@@ -6,6 +6,7 @@ module Add
 
 import TTM
 
+-- | Transition table for a turing machine that adds two unary numbers.
 addTransitions =
   -- stop on first non-zero item to the right
   Rule     Sz  Zero          Sz  Zero MRight :+:
