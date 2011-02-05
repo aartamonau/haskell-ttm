@@ -1,6 +1,6 @@
 module Even
        (
-         evenTransitions
+         Even.even
        )
        where
 
@@ -10,7 +10,7 @@ import TTM
 -- unary number is even or odd. If it's odd then the machine terminates
 -- leaving single One symbol on the tape. If it's even then the machine
 -- terminates leaving the tape empty.
-evenTransitions =
+even =
   -- stop on first non-zero item to the right
   Rule     Sz  Zero     Sz  Zero MRight :+:
   Rule     Sz   One (S1 Sz)  One  MNoop :+:

@@ -1,13 +1,13 @@
 module Add
        (
-         addTransitions
+         add
        )
        where
 
 import TTM
 
 -- | Transition table for a turing machine that adds two unary numbers.
-addTransitions =
+add =
   -- stop on first non-zero item to the right
   Rule     Sz  Zero          Sz  Zero MRight :+:
   Rule     Sz   One      (S1 Sz)  One  MNoop :+:
