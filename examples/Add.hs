@@ -1,3 +1,19 @@
+------------------------------------------------------------------------------
+-- |
+-- Module      : Add
+-- Copyright   : (C) 2011 Aliaksiej Artamonaŭ
+-- License     : LGPL
+--
+-- Maintainer  : aliaksiej.artamonau@gmail.com
+-- Stability   : unstable
+-- Portability : unportable
+--
+-- Example for TTM package. Adds two unary numbers situated to the right of
+-- the starting position of machine's head. The numbers are separated by one
+-- or more zero symbols.
+------------------------------------------------------------------------------
+
+
 module Add
        (
          add

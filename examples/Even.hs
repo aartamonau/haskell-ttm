@@ -1,3 +1,20 @@
+------------------------------------------------------------------------------
+-- |
+-- Module      : Even
+-- Copyright   : (C) 2011 Aliaksiej Artamonaŭ
+-- License     : LGPL
+--
+-- Maintainer  : aliaksiej.artamonau@gmail.com
+-- Stability   : unstable
+-- Portability : unportable
+--
+-- Example for TTM package. Decides whether unary number to the right of
+-- starting position of machine's head is even or odd. If it's odd the then
+-- single one symbol is left on the type. If it's even then no one symbols
+-- are left on the tape.
+------------------------------------------------------------------------------
+
+
 module Even
        (
          Even.even
@@ -7,9 +24,7 @@ module Even
 import TTM
 
 -- | Transition table for a turing machine which decides whether supplied
--- unary number is even or odd. If it's odd then the machine terminates
--- leaving single One symbol on the tape. If it's even then the machine
--- terminates leaving the tape empty.
+-- unary number is even or odd.
 even =
   -- stop on first non-zero item to the right
   Rule     Sz  Zero     Sz  Zero MRight :+:

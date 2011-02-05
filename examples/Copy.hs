@@ -1,3 +1,18 @@
+------------------------------------------------------------------------------
+-- |
+-- Module      : Copy
+-- Copyright   : (C) 2011 Aliaksiej Artamonaŭ
+-- License     : LGPL
+--
+-- Maintainer  : aliaksiej.artamonau@gmail.com
+-- Stability   : unstable
+-- Portability : unportable
+--
+-- Example for TTM package. Replicates an unary number to the right of the
+-- head of machine and positions the head between two replicas.
+------------------------------------------------------------------------------
+
+
 module Copy
        (
          copy
@@ -6,7 +21,7 @@ module Copy
 
 import TTM
 
--- | Transition table for a turing machine that replicates supplied binary
+-- | Transition table for a turing machine that replicates supplied unary
 -- number.
 copy =
   -- stop on the next item after the first non-zero

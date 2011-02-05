@@ -1,3 +1,30 @@
+------------------------------------------------------------------------------
+-- |
+-- Module      : TTM
+-- Copyright   : (C) 2011 Aliaksiej Artamonaŭ
+-- License     : LGPL
+--
+-- Maintainer  : aliaksiej.artamonau@gmail.com
+-- Stability   : unstable
+-- Portability : unportable
+--
+-- TTM stands for Type-level Turing Machine. It's an implementation of
+-- deterministic Turing machine that works whithin Haskell (at least GHC one)
+-- type system. Alphabet contains only two 'zero' and 'one' symbols. Noop is
+-- supported additionally to usual left and right movements. Machine state is
+-- presented by decimal number (refer to
+-- <http://okmij.org/ftp/Haskell/number-parameterized-types.html> for
+-- details). Every state for which suitable transition rule can't be found is
+-- treated as accepting state.
+--
+-- For particularly large transition tables GHC's context stack must be
+-- increased using @-fcontext-stack@ option.
+--
+-- Several examples can be found in @examples@ directory.
+--
+------------------------------------------------------------------------------
+
+
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -6,15 +33,13 @@
 
 module TTM
        (
+
+         -- * Auxilliary
+         -- ** Type-level list.
          Cons   ( (:+:) )
        , Nil    ( Nil )
-       , Tape   ( Tape )
-       , Rule   ( Rule )
-       , Zero   ( Zero )
-       , One    ( One )
-       , MLeft  ( MLeft )
-       , MRight ( MRight )
-       , MNoop  ( MNoop )
+
+         -- * Machine state.
        , Sz     ( Sz )
        , S0     ( S0 )
        , S1     ( S1 )
@@ -26,12 +51,32 @@ module TTM
        , S7     ( S7 )
        , S8     ( S8 )
        , S9     ( S9 )
+
+         -- * Alphabet.
+       , Zero   ( Zero )
+       , One    ( One )
+
+         -- * Movements.
+       , MLeft  ( MLeft )
+       , MRight ( MRight )
+       , MNoop  ( MNoop )
+
+         -- * Tape.
+       , Tape   ( Tape )
+
+         -- * Transition rule.
+       , Rule   ( Rule )
+
+         -- * Execution.
        , Exec   ( exec )
        )
        where
 
 infixr 5 :+:
+-- | Constructs type-level list from its head and tail.
 data Cons x xs = x :+: xs
+
+-- | Empty type-level list.
 data Nil = Nil
 
 data True
@@ -47,6 +92,8 @@ instance Head (Cons x xs) x
 class Tail xs t | xs -> t
 instance Tail (Cons x xs) xs
 
+-- | Constructs a tape from a list of cells to the left of the machine's head,
+-- one cell under the head and a list of cells to the right of the head.
 data Tape l c r = Tape l c r
 
 class Left t l | t -> l
@@ -55,7 +102,9 @@ instance Left (Tape l c r) l
 class Right t r | t -> r
 instance Right (Tape l c r) r
 
+-- | One.
 data One  = One
+-- | Zero.
 data Zero = Zero
 
 class IsSymbol s
@@ -79,8 +128,11 @@ instance Equals One  Zero False
 instance Equals Zero One  False
 instance Equals Zero Zero True
 
+-- | Move to the left.
 data MLeft  = MLeft
+-- | Move to the right.
 data MRight = MRight
+-- | Do nothing.
 data MNoop  = MNoop
 
 class IsMovement m
@@ -136,16 +188,27 @@ class Write a t t' | a t -> t' where
 instance Write Zero (Tape l c r) (Tape l Zero r)
 instance Write One  (Tape l c r) (Tape l One r)
 
+-- | Terminates decimal number.
 data Sz = Sz
+-- | Type-level 0.
 data S0 a = S0 a
+-- | Type-level 1.
 data S1 a = S1 a
+-- | Type-level 2.
 data S2 a = S2 a
+-- | Type-level 3.
 data S3 a = S3 a
+-- | Type-level 4.
 data S4 a = S4 a
+-- | Type-level 5.
 data S5 a = S5 a
+-- | Type-level 6.
 data S6 a = S6 a
+-- | Type-level 7.
 data S7 a = S7 a
+-- | Type-level 8.
 data S8 a = S8 a
+-- | Type-level 9.
 data S9 a = S9 a
 
 class IsState' s
@@ -277,7 +340,10 @@ instance (IsState' xs, IsState' ys) => Equals (S9 xs) (S6 ys) False
 instance (IsState' xs, IsState' ys) => Equals (S9 xs) (S7 ys) False
 instance (IsState' xs, IsState' ys) => Equals (S9 xs) (S8 ys) False
 
-
+-- | Defines a rule that is triggered when machine's state is @s@ and current
+-- symbol equals to @a@. As a result of execution of the rule machine's state
+-- is changed to @s'@, @a@ symbol on the tape is replaced by @a'@ and
+-- machine's is moved according to @m@.
 data Rule s a s' a' m = Rule s a s' a' m
 
 class IsRule r
@@ -339,6 +405,29 @@ instance (ExecStep tbl (Tape tnl tnc tnr) sn tn' sn',
           Exec' tbl tn' sn' (Tape tnl tnc tnr) sn t' s') =>
          Exec' tbl (Tape tnl tnc tnr) sn t s t' s'
 
+-- | Executes a transition table @tbl@ using @t@ as starting tape. Transition
+-- table is a type-level list of transition rules. Machine starts the execution
+-- in 'Sz' state. @t'@ is a transformed tape. @s'@ is a state in which the
+-- machine has finished the execution.
+--
+-- Example of ghci session (using @Add@ example from @examples@ directory):
+--
+-- @
+--  :m +Add
+--  :t exec add (Tape Nil
+--                  Zero
+--                  (One :+: One :+: Zero :+: One :+: One :+: One :+: Nil))
+-- @
+--
+-- @
+--  exec add (Tape Nil Zero (One :+: One :+: Zero :+: One :+: One :+: One :+: Nil))
+--   :: (Tape
+--         (Cons One (Cons One (Cons One (Cons One (Cons One Nil)))))
+--         Zero
+--         Nil,
+--       S1 (S0 Sz))
+-- @
+--
 class Exec tbl t t' s' | tbl t -> t' s' where
   exec :: tbl -> t -> (t', s')
   exec = undefined
