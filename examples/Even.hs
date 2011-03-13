@@ -30,8 +30,13 @@ even =
   Rule     Sz  Zero     Sz  Zero MRight :+:
   Rule     Sz   One (S1 Sz)  One  MNoop :+:
 
+  -- remove the number keeping the oddity of eliminated part;
+  -- S1 Sz — erased part is even
+  -- S2 Sz — erased part is odd
   Rule (S1 Sz)  One (S2 Sz) Zero MRight :+:
   Rule (S2 Sz)  One (S1 Sz) Zero MRight :+:
+
+  -- write back the result
   Rule (S1 Sz) Zero (S9 Sz) Zero MNoop  :+:
   Rule (S2 Sz) Zero (S9 Sz)  One MNoop  :+:
 
