@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-22021544-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'aartamonau'; // required: replace example with your forum shortname
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+
+    // hardcoding this for now
+    var disqus_identifier = 'haskell_ttm';
+    var disqus_url = 'http://shaleny.github.com/haskell-ttm';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+    <title>haskell-ttm</title>
+    <!-- Stylesheets. -->
+    <link rel="stylesheet" type="text/css" href="css/default.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/syntax.css"></link>
+  </head>
+
+  <body>
+    <div class="wrapper">
+
+      <div class="header">
+        <a href="http://github.com/shaleny/haskell-ttm">
+          <img class="forkme" src="images/forkme.png" alt="Fork me on GitHub"></img>
+        </a>
+        <h1>haskell-ttm</h1>
+      </div>
+
+      <div class="content">
+           <h2 id="rationale">Rationale</h2>
+<p><strong>TTM</strong> stands for <em>type-level Turing machine</em>. So <strong>haskell-ttm</strong> is a Turing machine working withing <strong>GHC</strong>’s type checker. It’s a bit hard to find sane reason doing such things. I can say that it was just fun. If anyone can invent any practical application of this please make me know. I will be extremely grateful.</p>
+<h2 id="usage">Usage</h2>
+<p>In order to perform type-level computation using <strong>ttm</strong> package two things must be done:</p>
+<ul>
+<li>Turing machine transition table must be defined</li>
+<li>Starting state of machine’s state must be defined</li>
+</ul>
+<h3 id="common-types">Common types</h3>
+<p><strong>TTM</strong> uses alphabet contains two symbols:</p>
+<pre class="sourceCode"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">One</span>  <span class="fu">=</span> <span class="dt">One</span><br /><span class="kw">data</span> <span class="dt">Zero</span> <span class="fu">=</span> <span class="dt">Zero</span></code></pre>
+<p>Both transition tables and tapes are defined in the terms of type lists. The latter is defined as follows:</p>
+<pre class="sourceCode"><code class="sourceCode haskell"><span class="kw">infixr</span> <span class="dv">5</span> <span class="fu">:+:</span><br /><span class="kw">data</span> <span class="dt">Cons</span> x xs <span class="fu">=</span> x <span class="fu">:+:</span> xs<br /><span class="kw">data</span> <span class="dt">Nil</span> <span class="fu">=</span> <span class="dt">Nil</span></code></pre>
+<p>Actually, as we need only type-level representation of lists this definition is excessive. We could only define appropriate type constructors omitting data constructors. What’s more, using <strong>GHC</strong>’s <em>TypeOperators</em> extensions it’s possible to define infix type constructors. But I find it more convenient to write <code>Zero :+: Zero :+: One :+: Nil</code> instead of <code>undefined :: Zero :+: Zero :+: One :+: Nil</code>.</p>
+<h3 id="transition-tables">Transition tables</h3>
+<p>Transition table is just a list of transition rules. Here is the definition of transition rule:</p>
+<pre class="sourceCode"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Rule</span> s a s' a' m <span class="fu">=</span> <span class="dt">Rule</span> s a s' a' m</code></pre>
+<p>It prescribes that given a machine in a state <code>s</code> and a symbol <code>a</code> under its head new symbol <code>a'</code> must be written to the tape, new state <code>s'</code> must be assigned to the machine and its head must be moved according to <code>m</code>.</p>
+<p>Machine’s state is represented as a decimal number as it’s described in the <em>“Number-parameterized types”</em><sup><a href="#fn1" class="footnoteRef" id="fnref1">1</a></sup> paper.</p>
+<p>Examples:</p>
+<pre class="sourceCode"><code class="sourceCode haskell"><span class="dt">Sz</span>           <span class="co">-- zero state</span><br />(<span class="dt">S1</span> (<span class="dt">S0</span> <span class="dt">Sz</span>)) <span class="co">-- tenth state</span></code></pre>
+<p>And so forth.</p>
+<p>Possible movements are the following:</p>
+<pre class="sourceCode"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">MLeft</span>  <span class="co">-- move left</span><br /><span class="kw">data</span> <span class="dt">Mright</span> <span class="co">-- mover right</span><br /><span class="kw">data</span> <span class="dt">MNoop</span>  <span class="co">-- hold still</span></code></pre>
+<p>Simple transition table to move machine’s head to times to the left and stop:</p>
+<pre class="sourceCode"><code class="sourceCode haskell">table <span class="fu">=</span> <span class="dt">Rule</span>     <span class="dt">Sz</span>   <span class="dt">One</span> (<span class="dt">S1</span> <span class="dt">Sz</span>)  <span class="dt">One</span> <span class="dt">MLeft</span> <span class="fu">:+:</span><br />        <span class="dt">Rule</span>     <span class="dt">Sz</span>  <span class="dt">Zero</span> (<span class="dt">S1</span> <span class="dt">Sz</span>) <span class="dt">Zero</span> <span class="dt">MLeft</span> <span class="fu">:+:</span><br />        <span class="dt">Rule</span> (<span class="dt">S1</span> <span class="dt">Sz</span>)  <span class="dt">One</span> (<span class="dt">S2</span> <span class="dt">Sz</span>)  <span class="dt">One</span> <span class="dt">MLeft</span> <span class="fu">:+:</span><br />        <span class="dt">Rule</span> (<span class="dt">S1</span> <span class="dt">Sz</span>) <span class="dt">Zero</span> (<span class="dt">S2</span> <span class="dt">Sz</span>) <span class="dt">Zero</span> <span class="dt">MLeft</span> <span class="fu">:+:</span><br />        <span class="dt">Nil</span></code></pre>
+<h3 id="tape">Tape</h3>
+<p>Tape is represented with respect to the current position of machine’s head:</p>
+<pre class="sourceCode"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Tape</span> l c r <span class="fu">=</span> <span class="dt">Tape</span> l c r</code></pre>
+<p>Here <code>c</code> is the symbol that is situated under the head, <code>l</code> is the list of symbols to the left of the head, and, similarly, <code>r</code> is the list of symbols to the right of the head. As tape should be infinite <code>l</code> and <code>r</code> must contain only meaningful part of the symbols from the relevant side. It’s supposed that all the cells after the specified in <code>l</code> or <code>r</code> are filled with <code>Zero</code> symbols. If machine passes the end of specified part of the tape <code>Zero</code> symbols are automatically created. And in case machine moves back without changing anything those <code>Zero</code>s are eliminated to not contaminate the result.</p>
+<h3 id="execution">Execution</h3>
+<p>To execute Turing machine <code>exec</code> function must be used. It has the following definition:</p>
+<pre class="sourceCode"><code class="sourceCode haskell"><span class="ot">exec </span><span class="ot">::</span> (<span class="dt">Exec</span> tbl (t, <span class="dt">Sz</span>) <span class="fu">~</span> r, <span class="dt">IsTape</span> t, <span class="dt">IsTransitionTable</span> tbl) <span class="ot">=&gt;</span> tbl <span class="ot">-&gt;</span> t <span class="ot">-&gt;</span> r<br />exec <span class="fu">=</span> <span class="fu">undefined</span></code></pre>
+<p>The function takes a transition table, a tape and returns a pair of transformed tape and the final state of machine. <code>IsTape</code> and <code>IsTransitionTable</code> constraints just ensure that the arguments actually have needed type structure. Type family <code>Exec</code> is what actually performs the execution. Details are omitted. The body of the <code>exec</code> function which is just <code>undefined</code> reminds us one more time that computation exists only in compile-time.</p>
+<p>When execution is performed all the rules in the transition table are traversed until one that matches current state and symbol under the head is found. Tape and machine’s state are changed in accordance with this rule and the process is repeated. Execution stops when it’s impossible to find matching rule.</p>
+<h3 id="examples">Examples</h3>
+<p>All the numbers in the examples are encoded using <em>unary system</em><sup><a href="#fn2" class="footnoteRef" id="fnref2">2</a></sup>.</p>
+<p>We can determine whether a number to the right of starting position is even or odd. If it’s odd we leave <code>One</code> symbol on the tape. If it’s even — the tape is left completely empty.</p>
+<pre class="sourceCode"><code class="sourceCode haskell"><span class="fu">&gt;&gt;&gt;</span> <span class="kw">import</span> <span class="dt">TTM</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span> <span class="fu">even</span> <span class="fu">=</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- stop on first non-zero item to the right</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span>     <span class="dt">Sz</span>  <span class="dt">Zero</span>     <span class="dt">Sz</span>  <span class="dt">Zero</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span>     <span class="dt">Sz</span>   <span class="dt">One</span> (<span class="dt">S1</span> <span class="dt">Sz</span>)  <span class="dt">One</span>  <span class="dt">MNoop</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- remove the number keeping the oddity of eliminated part;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- S1 Sz — erased part is even</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- S2 Sz — erased part is odd</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S1</span> <span class="dt">Sz</span>)  <span class="dt">One</span> (<span class="dt">S2</span> <span class="dt">Sz</span>) <span class="dt">Zero</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S2</span> <span class="dt">Sz</span>)  <span class="dt">One</span> (<span class="dt">S1</span> <span class="dt">Sz</span>) <span class="dt">Zero</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- write back the result</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S1</span> <span class="dt">Sz</span>) <span class="dt">Zero</span> (<span class="dt">S9</span> <span class="dt">Sz</span>) <span class="dt">Zero</span> <span class="dt">MNoop</span>  <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S2</span> <span class="dt">Sz</span>) <span class="dt">Zero</span> (<span class="dt">S9</span> <span class="dt">Sz</span>)  <span class="dt">One</span> <span class="dt">MNoop</span>  <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Nil</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span> <span class="fu">:</span>t exec <span class="fu">even</span> (<span class="dt">Tape</span> <span class="dt">Nil</span> <span class="dt">Zero</span> (<span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">Nil</span>))<br />exec <span class="fu">even</span> (<span class="dt">Tape</span> <span class="dt">Nil</span> <span class="dt">Zero</span> (<span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">Nil</span>))<br /><span class="ot">  </span><span class="ot">::</span> (<span class="dt">Tape</span> <span class="dt">Nil</span> <span class="dt">One</span> <span class="dt">Nil</span>, <span class="dt">S9</span> <span class="dt">Sz</span>)</code></pre>
+<p>So now we finally know that <em>3</em> is odd number.</p>
+<p>Additionally we can find out what is the sum of <em>3</em> and <em>2</em>:</p>
+<pre class="sourceCode"><code class="sourceCode haskell"><span class="fu">&gt;&gt;&gt;</span> <span class="kw">import</span> <span class="dt">TTM</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span> add <span class="fu">=</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- stop on first non-zero item to the right</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span>     <span class="dt">Sz</span>  <span class="dt">Zero</span>          <span class="dt">Sz</span>  <span class="dt">Zero</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span>     <span class="dt">Sz</span>   <span class="dt">One</span>      (<span class="dt">S1</span> <span class="dt">Sz</span>)  <span class="dt">One</span>  <span class="dt">MNoop</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- find first zero separator between the numbers</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S1</span> <span class="dt">Sz</span>)  <span class="dt">One</span>      (<span class="dt">S1</span> <span class="dt">Sz</span>)  <span class="dt">One</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S1</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>      (<span class="dt">S2</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>  <span class="dt">MNoop</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- go to position next to the first unit of the second number</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S2</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>      (<span class="dt">S2</span> <span class="dt">Sz</span>) <span class="dt">Zero</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S2</span> <span class="dt">Sz</span>)  <span class="dt">One</span>      (<span class="dt">S3</span> <span class="dt">Sz</span>)  <span class="dt">One</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- if we've found zero here then it's the last item of the second number;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- so we stop after shifting the last unit;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S3</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>      (<span class="dt">S4</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>  <span class="dt">MLeft</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- -- otherwise we continue shuttling</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S3</span> <span class="dt">Sz</span>)  <span class="dt">One</span>      (<span class="dt">S7</span> <span class="dt">Sz</span>)  <span class="dt">One</span>  <span class="dt">MLeft</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- move to the last unit to the first number</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S4</span> <span class="dt">Sz</span>)  <span class="dt">One</span>      (<span class="dt">S5</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>  <span class="dt">MLeft</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S5</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>      (<span class="dt">S5</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>  <span class="dt">MLeft</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S5</span> <span class="dt">Sz</span>)  <span class="dt">One</span>      (<span class="dt">S6</span> <span class="dt">Sz</span>)  <span class="dt">One</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- write unit here and halt</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S6</span> <span class="dt">Sz</span>) <span class="dt">Zero</span> (<span class="dt">S1</span> <span class="fu">$</span> <span class="dt">S0</span> <span class="dt">Sz</span>)  <span class="dt">One</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="co">-- move one unit and then return back for the next one</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S7</span> <span class="dt">Sz</span>)  <span class="dt">One</span>      (<span class="dt">S8</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>  <span class="dt">MLeft</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S8</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>      (<span class="dt">S8</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>  <span class="dt">MLeft</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S8</span> <span class="dt">Sz</span>)  <span class="dt">One</span>      (<span class="dt">S9</span> <span class="dt">Sz</span>)  <span class="dt">One</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Rule</span> (<span class="dt">S9</span> <span class="dt">Sz</span>) <span class="dt">Zero</span>      (<span class="dt">S2</span> <span class="dt">Sz</span>)  <span class="dt">One</span> <span class="dt">MRight</span> <span class="fu">:+:</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span>   <span class="dt">Nil</span><br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span> tape <span class="fu">=</span> (<span class="dt">Tape</span> <span class="dt">Nil</span><br /><span class="fu">&gt;&gt;&gt;</span>              <span class="dt">Zero</span><br /><span class="fu">&gt;&gt;&gt;</span>              (<span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">Zero</span> <span class="fu">:+:</span> <span class="dt">Zero</span> <span class="fu">:+:</span> <span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">One</span> <span class="fu">:+:</span> <span class="dt">Nil</span>))<br /><span class="fu">&gt;&gt;&gt;</span><br /><span class="fu">&gt;&gt;&gt;</span> <span class="fu">:</span>t exec add tape<br />exec add tape<br /><span class="ot">  </span><span class="ot">::</span> (<span class="dt">Tape</span><br />        (<span class="dt">Cons</span> <span class="dt">One</span> (<span class="dt">Cons</span> <span class="dt">One</span> (<span class="dt">Cons</span> <span class="dt">One</span> (<span class="dt">Cons</span> <span class="dt">One</span> (<span class="dt">Cons</span> <span class="dt">One</span> <span class="dt">Nil</span>)))))<br />        <span class="dt">Zero</span><br />        <span class="dt">Nil</span>,<br />      <span class="dt">S1</span> (<span class="dt">S0</span> <span class="dt">Sz</span>))</code></pre>
+<h2 id="reflections">Reflections</h2>
+<p>This package was implemented using techniques from <em>“Fun with Functional Dependencies”</em><sup><a href="#fn3" class="footnoteRef" id="fnref3">3</a></sup> at first. But transition from <strong>GHC 6.12</strong> to <strong>GHC 7.0</strong> made that implementation really, really slow. That’s why I rewritten it using type families (<em>“Fun with Type Functions”</em><sup><a href="#fn4" class="footnoteRef" id="fnref4">4</a></sup> was of great help). Another problem that arose during the transition is that in order to execute transition tables bigger than one or two rules I was obliged to increase <strong>GHC</strong>’s context stack (using <em>-fcontext-stack=n</em> option) significantly. It was a hope that this would be resolved with migration to type families implementation. Alas! And I’m still not sure whether there’s a way to resolve this inconvenience. Currently, on the <strong>GHC 7.0.2</strong> I must set context stack size to <em>150</em> in order to execute summation example from above (<em>100</em> will not go; other values has not been trialed).</p>
+<h2 id="references">References</h2>
+<div class="footnotes">
+<hr></hr>
+<ol>
+<li id="fn1"><p><a href="http://okmij.org/ftp/Haskell/number-parameterized-types.html">Number-parameterized Types</a> <a href="#fnref1" class="footnoteBackLink" title="Jump back to footnote 1">↩</a></p></li>
+<li id="fn2"><p><a href="http://en.wikipedia.org/wiki/Unary_numeral_system">Unary Numeral System</a> <a href="#fnref2" class="footnoteBackLink" title="Jump back to footnote 2">↩</a></p></li>
+<li id="fn3"><p><a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.22.7806">Fun with Functional Dependencies</a> <a href="#fnref3" class="footnoteBackLink" title="Jump back to footnote 3">↩</a></p></li>
+<li id="fn4"><p><a href="http://www.haskell.org/haskellwiki/Simonpj/Talk:FunWithTypeFuns">Fun with Type Functions</a> <a href="#fnref4" class="footnoteBackLink" title="Jump back to footnote 4">↩</a></p></li>
+</ol>
+</div>
+
+           <div id="disqus_thread"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>
+        Site proudly generated by
+        <a href="http://github.com/jaspervdj/hakyll">hakyll</a>.
+      </div>
+      <div>
+        <a href="http://disqus.com" class="dsq-brlink">
+          blog comments powered by <span class="logo-disqus">Disqus</span>
+        </a>
+      </div>
+    </div>
+
+  </body>
+</html>
